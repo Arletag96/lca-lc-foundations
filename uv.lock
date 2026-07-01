@@ -1708,6 +1708,20 @@ wheels = [
 ]
 
 [[package]]
+name = "langchain-tools"
+version = "0.1.34"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain" },
+    { name = "langchain-community" },
+    { name = "langchain-openai" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d3/fa/2387ae54fa15c7dd7614b31776d8b5ad69aea91c2ed1d789087921f5df37/langchain-tools-0.1.34.tar.gz", hash = "sha256:9d10fa288b2611342d3ae8c9aa44f8aba34d7e2ea5ce92aed320bc11eff12c05", size = 6456, upload-time = "2024-05-20T09:31:47.654Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/02/5ff870fd2b1ccf9c8527d84c6bb4b74284f73c528f51b7b5cdca5f318843/langchain_tools-0.1.34-py3-none-any.whl", hash = "sha256:02a171f6a3ab511ed48ca7af67266784e3a80f3293858096df6fe0048eea1d56", size = 8508, upload-time = "2024-05-20T09:31:45.656Z" },
+]
+
+[[package]]
 name = "langgraph"
 version = "1.2.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1896,6 +1910,7 @@ dependencies = [
     { name = "langchain-openai" },
     { name = "langchain-tavily" },
     { name = "langchain-text-splitters" },
+    { name = "langchain-tools" },
     { name = "langgraph" },
     { name = "langgraph-api" },
     { name = "langgraph-cli" },
@@ -1925,6 +1940,7 @@ requires-dist = [
     { name = "langchain-openai", specifier = ">=1.1.14" },
     { name = "langchain-tavily", specifier = ">=0.2.13" },
     { name = "langchain-text-splitters", specifier = ">=1.1.2" },
+    { name = "langchain-tools", specifier = ">=0.1.34" },
     { name = "langgraph", specifier = ">=1.0.3" },
     { name = "langgraph-api", specifier = ">=0.5.37" },
     { name = "langgraph-cli", specifier = ">=0.4.9" },
