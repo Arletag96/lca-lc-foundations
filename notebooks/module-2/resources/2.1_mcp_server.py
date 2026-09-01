@@ -49,7 +49,9 @@ def prompt():
     - search_web: Search the web for information
     - github_file: Access the langchain-ai repo files
 
-    If the user asks a question that is not related to LangChain, LangGraph or LangSmith, you should say "I'm sorry, I can only answer questions about LangChain, LangGraph and LangSmith."
+    If the user asks a question that is not related to LangChain, LangGraph or LangSmith, you should say 
+    
+    "I'm sorry, I can only answer questions about LangChain, LangGraph and LangSmith."
 
     You may try multiple tool and resource calls to answer the user's question.
 
