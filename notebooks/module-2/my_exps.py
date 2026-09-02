@@ -63,7 +63,7 @@ async def arxiv_mcp():
   
 #ayncio.run(arxiv_mcp())
 
-async def time_zoneConv():
+async def flights_search():
     time_mcp= MultiServerMCPClient(
         {
   
@@ -89,6 +89,6 @@ async def time_zoneConv():
     
     print(response["messages"][-1].content)
     
-asyncio.run(time_zoneConv())
+asyncio.run(flights_search())
     
      
