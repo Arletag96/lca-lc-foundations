@@ -4,44 +4,54 @@ from langchain.tools import tool
 from langchain.agents import create_agent
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.checkpoint.memory import InMemorySaver
-from langchain.messages import HumanMessage, AIMessage, SystemMessage 
+from langchain.messages import HumanMessage, AIMessage, SystemMessage,ToolMessage
 from typing import Dict, Any
 from tavily import TavilyClient
 from langchain_community.utilities import SQLDatabase
-
+from langchain.agents import AgentState
+from langchain.tools import ToolRuntime
+from langgraph.types import Command
 
 load_dotenv()
+# CREATE STATE
+class WeddingState(AgentState):
+    origin:str
+    destination:str
+    guest_cant:int
+    music_gen:str
+    
 
 #  -----------------------------------------***** FLIGHTS *****------------------------------------------------------------------
-
-async def flights_search():     #to modify----*/*/*/*/*/*/*/*/*
+@tool
+async def flight_search():     
     client_flights= MultiServerMCPClient(
-        {
-  
+        {  
     "kiwi-com-flight-search": {
       "url": "https://mcp.kiwi.com",
       "transport":"http",
                 }
-            
-        }
+            }
     )
-    tools = await client_flights.get_tools()
+    F_tools = await client_flights.get_tools()
+    return F_tools
     
-    flight_agent=create_agent(model="gpt-5-nano", 
-                           tools= tools,
-                           checkpointer=InMemorySaver(),)
     
-    config = {"configurable": {"thread_id": "Plan"}}
+flight_agent=create_agent(model="gpt-5-nano", 
+                        tools= flight_search(),
+                        checkpointer=InMemorySaver(),)
+
+config = {"configurable": {"thread_id": "Plan"}}
+
+system_prompt="""You are a travel agent and will help the user search flights to and from the selected destination. 
+                Just pick two options, one for each direction. No follow up questions."""
+            
+
+response = await flight_agent.ainvoke({"messages":messages_F},
+                                    config)
+
+print(response["messages"][-1].content)
     
-    messages_F=[SystemMessage(content="You are a travel agent and will help the user search flights to and from the selected destination. Just pick two options, one for each direction. No follow up questions."),
-                HumanMessage(content="I want to celebrate my wedding at Toronto. Can you find me some flights from Madrid to Toronto?")]
-    
-    response = await flight_agent.ainvoke({"messages":messages_F},
-                                       config)
-    
-    print(response["messages"][-1].content)
-    
-asyncio.run(flights_search())
+asyncio.run(flight_search())
 
 #--------------------------------------------*****VENUE*****-------------------------------------------------------------------------------------------------------
 
@@ -76,7 +86,7 @@ playlist_agent = create_agent(
     tools=[SQL_query]
 )
 
-#----------------------------------*****COORDINATOR's TOOLS (SUBAGENTS)*****-------------------------------------------------------------------------------------------    
+#----------------------------------*****COORDINATOR's TOOLS *****-------------------------------------------------------------------------------------------    
 
 @tool
 def call_flight_agent():
@@ -96,8 +106,25 @@ def call_playlist_agent():
     response_PL=playlist_agent.invoke({"messages":[HumanMessage(content=f"You are dj agent that looks for a perfect playlist for a wedding in {location}")]})
     return response_PL["messages"][-1].content
 
+@tool
+def update_state(origin:str, destination:str, guest_cant:int, music_genre:str, runtime:ToolRuntime) -> Command:
+    """Update the state when you know all of the values: origin, destination, guest_count, genre. 
+        This tool must be called alone, without any other tool calls. It must complete and return to make,
+        the information available to other tools."""
+    return Command(update={
+        "origin":origin,
+        "destination": destination,
+        "guest_cant": guest_cant,
+        "music_genre":music_genre,
+        "messages":[ToolMessage("Successfully updated Agent State", tool_call_id=runtime.tool_call_id)]})
+    
+
+    
+    
 
 #------------------------------*****COORDINATOR AGENT*****-------------------------------------------------------------------------------------------------
+
+
 
 coord_agent=create_agent(
     model="gpt-5-nano",
@@ -107,3 +134,4 @@ coord_agent=create_agent(
 
 question=""
 response=coord_agent.invoke({"messages":[HumanMessage(content=question)]})
+
